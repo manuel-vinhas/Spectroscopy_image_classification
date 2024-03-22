@@ -1,0 +1,107 @@
+<html>
+<head>
+    <title>AI de suporte ao diagnostico de cancro do pulmao</title>
+    <style>
+        .content-container {
+            display: flex; 
+            justify-content: left; 
+            align-items: center; 
+            text-align: left;  
+            margin-top: 50px; 
+        }
+        .image-container {
+            margin-right: 20px; 
+        }
+        img {
+            display: block; 
+            width: 816px; 
+            height: 360px; 
+        }
+        h1 {
+            text-align: center; 
+            margin-bottom: 70px; 
+            font-size: 60px; 
+        }
+        .classify-button {
+            display: inline-block; 
+            margin-top: 20px; 
+            margin-left: 320px; 
+            font-size: 20px; 
+        }
+        .text-block p {
+            font-size: 30px; 
+        }
+        .upload-form{
+            font-size: 17px; 
+        }
+        label{
+            font-size: 20px; 
+        }
+        .model-selection{
+            margin-top: 5px; 
+        }
+        body {
+            display: block;
+            margin: 100px;
+        }
+        body {
+            background-image: url('/static/nova-fct-msc-cover-back-1.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center center;
+            color: white;
+        }
+    </style>
+    <script>
+        function sendModelSelection() {
+            var selectedModel = document.getElementById('modelDropdown').value;
+
+            // Create an AJAX request
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/select-model-single", true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify({
+                model: selectedModel
+            }));
+        }
+    </script>
+</head>
+<body>
+    <h1>AI de suporte ao diagnostico de cancro do pulmao</h1>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <label>Upload da imagem espetrografica:</label>
+        <input type="file" name="img" accept="image/*" class="upload-form">
+        <input type="submit" value="Upload" class="upload-form">
+    </form>
+    <div class="model-selection">
+        <label for="modelDropdown">Escolha do modelo de classificacao de imagem:</label>
+        <select id="modelDropdown" onchange="sendModelSelection()">
+            <option>---Select model---</option>
+            <option value="CNN_90_03.keras">CNN_90_03</option>
+            <option value="CNN_94_05.keras">CNN_94_05</option>
+            <option value="CNN_96_02.keras">CNN_96_02</option>
+            <option value="CNN_86_04.keras">CNN_86_04</option>
+            <option value="CNN_82_05.keras">CNN_82_05</option>
+            <option value="CNN_98_01_cGAN.keras">CNN_98_01</option>
+        </select>
+    </div>
+    {% if filename %}
+        <div class="content-container">
+            <div class="image-container">
+                <img src="{{ url_for('static', filename='images/' + filename) }}" alt="Uploaded Image">
+                <form action="{{ url_for('classify_image', filename=filename) }}">
+                    <input type="submit" value="Classificar Imagem" class="classify-button">
+                </form>
+            </div>
+            <div class="text-block">
+                {% if result and pred and pred_perc and model %}
+                    <p>Modelo selecionado: {{ model }}</p>
+                    <p>Resultado do diagnostico: {{ result }}</p>
+                    <p>Percentagem de confianca na previsao: {{pred_perc}}% ({{ pred }})</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</body>
+</html>
