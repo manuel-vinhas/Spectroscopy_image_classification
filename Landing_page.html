@@ -1,0 +1,80 @@
+<html>
+<head>
+    <title>Classificacao de Imagem</title>
+    <style>
+    .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .choice-button {
+        display: inline-block;
+        padding: 15px 30px; 
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 24px; 
+    }
+
+    .choice-button:hover {
+        background-color: #0056b3;
+    }
+
+    .option{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column; 
+    }
+
+    .option span {
+        margin-bottom: 20px; 
+        font-size: 24px; 
+        color: #ffffff; 
+    }
+
+    h1 {
+    text-align: center; 
+    margin-top: 50px; 
+    margin-left: 50px; 
+    margin-right: 50px; 
+    margin-bottom: 20px; 
+    font-size: 60px; 
+    color: #ffffff; 
+}
+
+
+    body {
+        background-image: url('/static/nova-fct-msc-cover-back-1.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center center;
+        color: white;
+        height: 100vh; 
+        margin: 0; 
+    }
+    </style>
+</head>
+<body>
+    <h1>Bem-vindo a ferramenta de suporte ao diagnostico de cancro do pulmao</h1>
+    <div class="option">
+        <span>Escolha uma opcao:</span>
+        <div class="button-container">
+            <div>
+                <a href="{{ url_for('classify_single') }}" class="choice-button">Classificar uma Imagem</a>
+            </div>
+            <div>
+                <a href="{{ url_for('classify_multiple') }}" class="choice-button">Classificar Multiplas Imagens</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
