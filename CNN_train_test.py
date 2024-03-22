@@ -315,6 +315,53 @@ def googlenet(input_shape, num_classes):
     model = Model(inputs=input_img, outputs=x)
     return model
 
+def residual_block(x, filters, kernel_size=3, stride=1, conv_shortcut=False):
+    """
+    A basic residual block for ResNet-18.
+    """
+    shortcut = x
+
+    if conv_shortcut:
+        shortcut = Conv2D(filters, (1, 1), strides=stride, kernel_regularizer=regularizers.l2(0.00001))(x)
+        shortcut = BatchNormalization()(shortcut)
+
+    x = Conv2D(filters, kernel_size=kernel_size, strides=stride, padding="same", kernel_regularizer=regularizers.l2(0.00001))(x)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
+    x = Conv2D(filters, kernel_size=kernel_size, strides=1, padding="same", kernel_regularizer=regularizers.l2(0.00001))(x)
+    x = BatchNormalization()(x)
+    x = Add()([x, shortcut])
+    x = ReLU()(x)
+    return x
+
+
+def build_resnet18(input_shape, num_classes=1):
+    """
+    Builds a ResNet-18 model.
+    """
+    inputs = Input(shape=input_shape)
+    x = Conv2D(64, (7, 7), strides=2, padding="same", kernel_regularizer=regularizers.l2(0.00001))(inputs)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
+
+    x = residual_block(x, 64, stride=1, conv_shortcut=True)
+    x = residual_block(x, 64, stride=1)
+
+    x = residual_block(x, 128, stride=2, conv_shortcut=True)
+    x = residual_block(x, 128, stride=1)
+
+    x = residual_block(x, 256, stride=2, conv_shortcut=True)
+    x = residual_block(x, 256, stride=1)
+
+    x = residual_block(x, 512, stride=2, conv_shortcut=True)
+    x = residual_block(x, 512, stride=1)
+
+    x = GlobalAveragePooling2D()(x)
+    outputs = Dense(num_classes, activation="sigmoid", kernel_regularizer=regularizers.l2(0.00001))(x)
+
+    model = Model(inputs, outputs)
+    return model
+
 # Model compilation and fitting
 # Call the model definition function
 model = create_model()
