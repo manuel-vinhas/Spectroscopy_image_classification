@@ -1,0 +1,157 @@
+<html>
+<head>
+    <title>AI de suporte ao diagnostico de cancro do pulmao</title>
+    <style>
+        .content-container {
+            display: flex; 
+            justify-content: left; 
+            align-items: center; 
+            text-align: left; 
+            margin-top: 50px; 
+        }
+        .image-result-container {
+            margin-right: 20px; 
+        }
+        img {
+            display: block; 
+            width: 816px; 
+            height: 360px; 
+        }
+        .classify-button {
+            display: inline-block; 
+            margin-top: 20px;  
+            margin-left: 320px; 
+            font-size: 20px; 
+        }
+        .text-block p {
+            font-size: 30px;
+        }
+        .upload-form{
+            font-size: 17px; 
+        }
+        label{
+            font-size: 20px; 
+        }
+        h1 {
+            text-align: center; 
+            margin-bottom: 70px;
+            font-size: 60px; 
+        }
+        .table-container {
+            width: 100%; 
+            display: flex;
+            justify-content: center; 
+        }
+
+        table {
+            margin-left: auto;
+            margin-right: auto;
+            border-collapse: collapse; 
+        }
+
+        table, th, td {
+            border: 1px solid black; 
+        }
+
+        th, td {
+            padding: 8px; 
+            text-align: center; 
+        }
+        body {
+            display: block;
+            margin: 100px;
+        }
+        .results-model{
+            font-size: 20px;
+        }
+        body {
+            background-image: url('/static/nova-fct-msc-cover-back-1.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center center;
+            color: white;
+        }
+        .positive-result {
+            background-color: red;
+            color: white;
+        }
+
+        .negative-result {
+            background-color: green;
+            color: white;
+        }
+    </style>
+    <script>
+        function sendModelSelection() {
+            var selectedModel = document.getElementById('modelDropdown').value;
+
+            // Create an AJAX request
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/select-model-multiple", true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify({
+                model: selectedModel
+            }));
+        }
+    </script>
+</head>
+<body>
+    <h1>AI de suporte ao diagnostico de cancro do pulmao</h1>
+    <form action="/upload-images-classify" method="POST" enctype="multipart/form-data">
+        <label>Upload da imagem espetrografica:</label>
+        <input type="file" name="img" accept="image/*" multiple class="upload-form">
+        <input type="submit" value="Upload e Classificar" class="upload-form">
+    </form>
+    <div class="model-selection">
+        <label for="modelDropdown">Escolha do modelo de classificacao de imagem:</label>
+        <select id="modelDropdown" onchange="sendModelSelection()">
+            <option>---Select model---</option>
+            <option value="CNN_90_03.keras">CNN_90_03</option>
+            <option value="CNN_94_05.keras">CNN_94_05</option>
+            <option value="CNN_96_02.keras">CNN_96_02</option>
+            <option value="CNN_86_04.keras">CNN_86_04</option>
+            <option value="CNN_82_05.keras">CNN_82_05</option>
+           <option value="CNN_98_01_cGAN.keras">CNN_98_01</option>
+        </select>
+    </div>
+    <div class="results-model">
+        <p>Resultados para o modelo: {{ model }}</p>
+    </div>
+    <div class="table-container">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Nome da imagem</th>
+                    <th>Resultado</th>
+                    <th>Grau de confianca</th>
+                    <th>Percentagem de confianca</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for filename, result, pred, pred_perc in zip(filenames, results, preds, pred_percs) %}
+                <tr>
+                    <td>{{ filename }}</td>
+                    <td class="{{ 'positive-result' if result == 'Positivo' else 'negative-result' }}">
+                        {{ result }}
+                    </td>
+                    <td>{{ pred }}</td>
+                    <td>{{ pred_perc }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% for filename, result, pred, pred_perc in zip(filenames, results, preds, pred_percs) %}
+    <div class="content-container">
+        <div class="image-result-container">
+            <img src="{{ url_for('static', filename='images/' + filename) }}" alt="{{ filename }}">
+        </div>
+            <div class="text-block">
+                <p>Resultado do diagnostico: {{ result }}</p>
+                <p>Percentagem de confianca na previsao: {{pred_perc}}% ({{ pred }})</p>
+            </div>
+    </div>
+    {% endfor %}
+</body>
+</html>
