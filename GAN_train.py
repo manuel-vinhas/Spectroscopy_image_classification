@@ -7,6 +7,65 @@ import os
 import cv2 as cv
 import matplotlib.pyplot as plt
 
+# Image dimensions and number of channels
+img_height = 180
+img_width = 408
+num_channels = 1  
+
+# Numpy arrays for train images
+train_images = np.zeros((137, img_height, img_width))
+train_labels = np.zeros(137)
+
+# Numpy arrays for test images
+test_images = np.zeros((51, img_height, img_width))
+test_labels = np.zeros(51)
+
+# Numpy arrays for validation images
+val_images = np.zeros((15, img_height, img_width))
+val_labels = np.zeros(15)
+
+count1 = 0
+path = "B:\Downloads\Doentes"
+for files1 in os.listdir(path):
+    img = cv.imread(str(path) + "\\" + files1)
+    
+    # Convert images to grayscale and normalize to the interval [0,1]
+    img_normalized = (cv.cvtColor(img, cv.COLOR_BGR2GRAY) / 255.0)  
+    
+    if count1 < 57:
+        if count1 < 6:
+            val_images[count1] = img_normalized
+            val_labels[count1] = 1
+            count1 = count1 + 1
+            continue
+        train_images[count1 - 6] = img_normalized
+        train_labels[count1 - 6] = 1
+    else:
+        test_images[count1 - 57] = img_normalized
+        test_labels[count1 - 57] = 1
+    count1 = count1 + 1
+
+count2 = 0
+path2 = "B:\Downloads\Controlo"
+for files2 in os.listdir(path2):
+    img = cv.imread(str(path2) + "\\" + files2)
+    
+    # Convert images to grayscale and normalize to the interval [0,1]
+    img_normalized = (cv.cvtColor(img, cv.COLOR_BGR2GRAY) / 255.0)
+    
+    if count2 < 95:
+        if count2 < 9:
+            val_images[count2 + 6] = img_normalized
+            val_labels[count2 + 6] = 0
+            count2 = count2 + 1
+            continue
+        train_images[count2 + 51 - 9] = img_normalized
+        train_labels[count2 + 51 - 9] = 0
+    else:
+        test_images[count2 - 95 + 20] = img_normalized
+        test_labels[count2 - 95 + 20] = 0
+    count2 = count2 + 1
+
 def build_generator(latent_dim, num_classes, img_shape):
      noise = Input(shape=(latent_dim,))
      
