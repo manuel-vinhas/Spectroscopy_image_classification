@@ -316,9 +316,7 @@ def googlenet(input_shape, num_classes):
     return model
 
 def residual_block(x, filters, kernel_size=3, stride=1, conv_shortcut=False):
-    """
-    A basic residual block for ResNet-18.
-    """
+    
     shortcut = x
 
     if conv_shortcut:
@@ -336,9 +334,7 @@ def residual_block(x, filters, kernel_size=3, stride=1, conv_shortcut=False):
 
 
 def build_resnet18(input_shape, num_classes=1):
-    """
-    Builds a ResNet-18 model.
-    """
+    
     inputs = Input(shape=input_shape)
     x = Conv2D(64, (7, 7), strides=2, padding="same", kernel_regularizer=regularizers.l2(0.00001))(inputs)
     x = BatchNormalization()(x)
